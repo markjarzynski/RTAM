@@ -25,3 +25,5 @@ include_directories(
 mark_as_advanced(CUDA_SDK_ROOT_DIR)
 
 add_subdirectory(test)
+
+add_subdirectory(sutil)
