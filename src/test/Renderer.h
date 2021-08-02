@@ -2,6 +2,8 @@
 
 #include "optix7.h"
 
+#include "LaunchParams.h"
+
 namespace rtam {
 
     class Renderer {
