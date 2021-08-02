@@ -4,7 +4,6 @@ cuda_compile_and_embed(embedded_ptx_code devicePrograms.cu)
 
 add_executable(test
     ${embedded_ptx_code}
-    optix7.h
     CUDABuffer.h
     Renderer.h
     Renderer.cpp
