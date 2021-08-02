@@ -2,6 +2,10 @@
 
 #include "sutil/Exception.h"
 
+#include <cuda_runtime.h>
+#include <optix.h>
+#include <optix_stubs.h>
+
 #include <vector>
 #include <assert.h>
 

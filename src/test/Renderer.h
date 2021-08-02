@@ -3,11 +3,6 @@
 #include "CUDABuffer.h"
 #include "LaunchParams.h"
 
-#include "sutil/vec_math.h"
-
-#include <optix.h>
-#include <optix_stubs.h>
-
 namespace rtam {
 
     class Renderer {
