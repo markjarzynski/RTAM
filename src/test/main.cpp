@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "3rdParty/stb_image_write.h"
+
 namespace rtam {
 
     void initOptix() {
@@ -33,5 +36,5 @@ namespace rtam {
 
         return 0;
     }
-    
+
 };

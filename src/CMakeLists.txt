@@ -16,6 +16,8 @@ include(CMake/configure_optix.cmake)
 
 mark_as_advanced(CUDA_SDK_ROOT_DIR)
 
+include_directories(common)
+
 set(optix_LIBRARY "")
 
 add_subdirectory(test)
