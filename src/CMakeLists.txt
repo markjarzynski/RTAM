@@ -62,7 +62,34 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}
                      )
 
 set(SAMPLES_CUDA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cuda)
+set(SAMPLES_SUPPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/support")
 
+# NVRTC include paths relative to the sample path
+set(SAMPLES_RELATIVE_INCLUDE_DIRS "\\
+  \"cuda\", \\
+  \"sutil\", \\
+  \".\", ")
+
+# NVRTC absolute include paths to the headers used to build the samples
+set(SAMPLES_ABSOLUTE_INCLUDE_DIRS "\\
+  \"${OptiX_INCLUDE}\", \\
+  \"${CUDA_INCLUDE_DIRS}\", ")
+
+# Build a null-terminated option list for NVRTC
+set(CUDA_NVRTC_OPTIONS)
+foreach(flag ${CUDA_NVRTC_FLAGS})
+  set(CUDA_NVRTC_OPTIONS "${CUDA_NVRTC_OPTIONS} \\\n  \"${flag}\",")
+endforeach()
+set(CUDA_NVRTC_OPTIONS "${CUDA_NVRTC_OPTIONS}")
+
+configure_file(sampleConfig.h.in sampleConfig.h @ONLY)
+
+# Path to sutil.h that all the samples need
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}
+                     "${CMAKE_BINARY_DIR}/include"
+                     ${CMAKE_CURRENT_BINARY_DIR}
+                     ${CUDA_INCLUDE_DIRS}
+)
 
 
 mark_as_advanced(CUDA_SDK_ROOT_DIR)
