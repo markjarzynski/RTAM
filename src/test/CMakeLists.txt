@@ -2,6 +2,8 @@ include_directories(${OptiX_INCLUDE})
 
 add_executable(test
     optix7.h
+    Renderer.h
+    Renderer.cpp
     main.cpp
 )
 

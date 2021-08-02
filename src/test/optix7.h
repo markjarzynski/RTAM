@@ -3,7 +3,7 @@
 #include <cuda_runtime.h>
 #include <optix.h>
 #include <optix_stubs.h>
-#include <optix_function_table_definition.h>
+
 
 #define OPTIX_CHECK( call ) {                                                   \
     OptixResult res = call;                                                     \

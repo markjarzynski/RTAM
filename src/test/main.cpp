@@ -1,31 +1,16 @@
-#include "optix7.h"
-
-#include <iostream>
+#include "Renderer.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "3rdParty/stb_image_write.h"
 
+#include <iostream>
+
 namespace rtam {
-
-    void initOptix() {
-        cudaFree(0);
-        int numDevices;
-        cudaGetDeviceCount(&numDevices);
-
-        if (numDevices == 0) {
-            throw std::runtime_error("no CUDA capable devices found!");
-        }
-
-        std::cout << "found " << numDevices << " CUDA devices" << std::endl;
-
-        OPTIX_CHECK( optixInit() );
-    }
 
     extern "C" int main(int ac, char **av) {
         try {
-            std::cout << "initializing optix." << std::endl;
-
-            initOptix();
+            Renderer renderer;
+            renderer.render();
 
             std::cout << "successfully initialized optix." << std::endl;
             std::cout << "done. clean exit." << std::endl;
