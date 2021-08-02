@@ -1,51 +1,33 @@
-#include <cuda_runtime.h>
-#include <optix.h>
-#include <optix_stubs.h>
-#include <optix_function_table_definition.h>
+#include "optix7.h"
 
 #include <iostream>
 
-#define OPTIX_CHECK( call )                                             \
-  {                                                                     \
-    OptixResult res = call;                                             \
-    if( res != OPTIX_SUCCESS )                                          \
-      {                                                                 \
-        fprintf( stderr, "Optix call (%s) failed with code %d (line %d)\n", #call, res, __LINE__ ); \
-        exit( 2 );                                                      \
-      }                                                                 \
-  }
+void initOptix() {
+    cudaFree(0);
+    int numDevices;
+    cudaGetDeviceCount(&numDevices);
 
-void initOptix()
-{
-  // -------------------------------------------------------
-  // check for available optix7 capable devices
-  // -------------------------------------------------------
-  cudaFree(0);
-  int numDevices;
-  cudaGetDeviceCount(&numDevices);
-  if (numDevices == 0)
-    throw std::runtime_error("no CUDA capable devices found!");
-  std::cout << "found " << numDevices << " CUDA devices" << std::endl;
+    if (numDevices == 0) {
+        throw std::runtime_error("no CUDA capable devices found!");
+    }
 
-  // -------------------------------------------------------
-  // initialize optix
-  // -------------------------------------------------------
-  OPTIX_CHECK( optixInit() );
+    std::cout << "found " << numDevices << " CUDA devices" << std::endl;
+
+    OPTIX_CHECK( optixInit() );
 }
 
-extern "C" int main(int ac, char **av)
-{
-  try {
-    std::cout << "initializing optix..." << std::endl;
+extern "C" int main(int ac, char **av) {
+    try {
+        std::cout << "initializing optix." << std::endl;
 
-    initOptix();
+        initOptix();
 
-    std::cout << "successfully initialized optix... yay!" << std::endl;
-    std::cout << "done. clean exit." << std::endl;
+        std::cout << "successfully initialized optix." << std::endl;
+        std::cout << "done. clean exit." << std::endl;
+    } catch (std::runtime_error& e) {
+        std::cout << "FATAL ERROR: " << e.what() << std::endl;
+        exit(1);
+    }
 
-  } catch (std::runtime_error& e) {
-    std::cout << "FATAL ERROR: " << e.what() << std::endl;
-    exit(1);
-  }
-  return 0;
+    return 0;
 }
