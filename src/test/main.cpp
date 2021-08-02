@@ -2,32 +2,36 @@
 
 #include <iostream>
 
-void initOptix() {
-    cudaFree(0);
-    int numDevices;
-    cudaGetDeviceCount(&numDevices);
+namespace rtam {
 
-    if (numDevices == 0) {
-        throw std::runtime_error("no CUDA capable devices found!");
+    void initOptix() {
+        cudaFree(0);
+        int numDevices;
+        cudaGetDeviceCount(&numDevices);
+
+        if (numDevices == 0) {
+            throw std::runtime_error("no CUDA capable devices found!");
+        }
+
+        std::cout << "found " << numDevices << " CUDA devices" << std::endl;
+
+        OPTIX_CHECK( optixInit() );
     }
 
-    std::cout << "found " << numDevices << " CUDA devices" << std::endl;
+    extern "C" int main(int ac, char **av) {
+        try {
+            std::cout << "initializing optix." << std::endl;
 
-    OPTIX_CHECK( optixInit() );
-}
+            initOptix();
 
-extern "C" int main(int ac, char **av) {
-    try {
-        std::cout << "initializing optix." << std::endl;
+            std::cout << "successfully initialized optix." << std::endl;
+            std::cout << "done. clean exit." << std::endl;
+        } catch (std::runtime_error& e) {
+            std::cout << "FATAL ERROR: " << e.what() << std::endl;
+            exit(1);
+        }
 
-        initOptix();
-
-        std::cout << "successfully initialized optix." << std::endl;
-        std::cout << "done. clean exit." << std::endl;
-    } catch (std::runtime_error& e) {
-        std::cout << "FATAL ERROR: " << e.what() << std::endl;
-        exit(1);
+        return 0;
     }
-
-    return 0;
-}
+    
+};
