@@ -44,8 +44,8 @@ namespace rtam {
         CUDABuffer raygenRecordsBuffer;
         std::vector<OptixProgramGroup> missProgramGroups;
         CUDABuffer missRecordsBuffer;
-        std::vector<OptixProgramGroup> hitProgramGroups;
-        CUDABuffer hitRecordsBuffer;
+        std::vector<OptixProgramGroup> hitgroupProgramGroups;
+        CUDABuffer hitgroupRecordsBuffer;
         OptixShaderBindingTable sbt = {};
 
         LaunchParams launchParams;

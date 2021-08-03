@@ -25,14 +25,12 @@ namespace rtam {
         initOptix();
         createContext();
         createModule();
-        /*
         createRaygenPrograms();
         createMissPrograms();
         createHitgroupPrograms();
         createPipline();
         buildSBT();
         launchParamsBuffer.alloc(sizeof(launchParams));
-        */
     }
 
     void Renderer::initOptix() {
@@ -97,28 +95,105 @@ namespace rtam {
         char log[2048];
         size_t sizeof_log = sizeof(log);
         OPTIX_CHECK(optixModuleCreateFromPTX(optixContext, &moduleCompileOptions, &pipelineCompileOptions, ptxCode.c_str(), ptxCode.size(), log, &sizeof_log, &module));
-        if (sizeof_log > 1) {
-            fprintf(stderr, "%s\n", log);
-        }
+        if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::createRaygenPrograms() {
+        raygenProgramGroups.resize(1);
 
+        OptixProgramGroupOptions pgOptions = {};
+        OptixProgramGroupDesc pgDesc = {};
+        pgDesc.kind = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
+        pgDesc.raygen.module = module;
+        pgDesc.raygen.entryFunctionName = "__raygen__renderFrame";
+
+        char log[2048];
+        size_t sizeof_log = sizeof(log);
+        OPTIX_CHECK(optixProgramGroupCreate(optixContext, &pgDesc, 1, &pgOptions, log, &sizeof_log, &raygenProgramGroups[0]));
+        if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::createMissPrograms() {
+        missProgramGroups.resize(1);
 
+        OptixProgramGroupOptions pgOptions = {};
+        OptixProgramGroupDesc pgDesc = {};
+        pgDesc.kind = OPTIX_PROGRAM_GROUP_KIND_MISS;
+        pgDesc.miss.module = module;
+        pgDesc.miss.entryFunctionName = "__miss__radiance";
+
+        char log[2048];
+        size_t sizeof_log = sizeof(log);
+        OPTIX_CHECK(optixProgramGroupCreate(optixContext, &pgDesc, 1, &pgOptions, log, &sizeof_log, &missProgramGroups[0]));
+        if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::createHitgroupPrograms() {
+        hitgroupProgramGroups.resize(1);
 
+        OptixProgramGroupOptions pgOptions = {};
+        OptixProgramGroupDesc pgDesc = {};
+        pgDesc.kind = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
+        pgDesc.hitgroup.moduleCH = module;
+        pgDesc.hitgroup.entryFunctionNameCH = "__closesthit__radiance";
+        pgDesc.hitgroup.moduleAH = module;
+        pgDesc.hitgroup.entryFunctionNameAH = "__anyhit__radiance";
+
+        char log[2048];
+        size_t sizeof_log = sizeof(log);
+        OPTIX_CHECK(optixProgramGroupCreate(optixContext, &pgDesc, 1, &pgOptions, log, &sizeof_log, &hitgroupProgramGroups[0]));
+        if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::createPipline() {
 
+        std::vector<OptixProgramGroup> programGroups;
+
+        for (OptixProgramGroup pg : raygenProgramGroups) {
+            programGroups.push_back(pg);
+        }
+
+        for (OptixProgramGroup pg : missProgramGroups) {
+            programGroups.push_back(pg);
+        }
+
+        for (OptixProgramGroup pg : hitgroupProgramGroups) {
+            programGroups.push_back(pg);
+        }
+
+        char log[2048];
+        size_t sizeof_log = sizeof(log);
+        OPTIX_CHECK(optixPipelineCreate(optixContext, &pipelineCompileOptions, &pipelineLinkOptions, programGroups.data(), (int)programGroups.size(), log, &sizeof_log, &pipeline));
+        if (sizeof_log > 1) PRINT(log);
+
+        OPTIX_CHECK(optixPipelineSetStackSize(pipeline, 2048, 2048, 2048, 1));
+        if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::buildSBT() {
+
+        std::vector<RaygenRecord> raygenRecords;
+        for (OptixProgramGroup pg : raygenProgramGroups) {
+            RaygenRecord raygen_record;
+            OPTIX_CHECK(optixSbtRecordPackHeader(pg, &raygen_record));
+            raygen_record.data = nullptr;
+            raygenRecords.push_back(raygen_record);
+        }
+        raygenRecordsBuffer.alloc_and_upload(raygenRecords);
+        sbt.raygenRecord = raygenRecordsBuffer.d_pointer();
+
+        std::vector<MissRecord> missRecords;
+        for (OptixProgramGroup pg : missProgramGroups) {
+            MissRecord miss_record;
+            OPTIX_CHECK(optixSbtRecordPackHeader(pg, &miss_record));
+            miss_record.data = nullptr;
+            missRecords.push_back(miss_record);
+        }
+        missRecordsBuffer.alloc_and_upload(missRecords);
+        sbt.missRecordBase = missRecordsBuffer.d_pointer();
+        sbt.missRecordStrideInBytes = sizeof(MissRecord);
+        sbt.missRecordCount = (int)missRecords.size();
+
 
     }
 

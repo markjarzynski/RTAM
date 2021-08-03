@@ -2,12 +2,17 @@
 
 #include "sutil/Exception.h"
 
+#include <cuda.h>
 #include <cuda_runtime.h>
 #include <optix.h>
 #include <optix_stubs.h>
 
 #include <vector>
 #include <assert.h>
+
+#ifndef PRINT
+# define PRINT(var) std::cout << #var << "=" << var << std::endl;
+#endif
 
 namespace rtam {
 
@@ -28,11 +33,11 @@ namespace rtam {
         void alloc(size_t size) {
             assert(d_ptr == nullptr);
             this->sizeInBytes = size;
-            //CUDA_CHECK(Malloc((void**)&d_ptr, sizeInBytes));
+            CUDA_CHECK(cudaMalloc((void**)&d_ptr, sizeInBytes));
         }
 
         void free() {
-            //CUDA_CHECK(Free(d_ptr));
+            CUDA_CHECK(cudaFree(d_ptr));
             d_ptr = nullptr;
             sizeInBytes = 0;
         }
@@ -42,17 +47,16 @@ namespace rtam {
             upload((const T*)vt.data(), vt.size());
         }
 
-        template<typename T> void upload(const T *t, size_t count)
-        {
+        template<typename T> void upload(const T *t, size_t count) {
             assert(d_ptr != nullptr);
             assert(sizeInBytes == count*sizeof(T));
-            CUDA_CHECK(Memcpy(d_ptr, (void *)t, count * sizeof(T), cudaMemcpyHostToDevice));
+            CUDA_CHECK(cudaMemcpy(d_ptr, (void *)t, count * sizeof(T), cudaMemcpyHostToDevice));
         }
 
         template<typename T> void download(T *t, size_t count) {
             assert(d_ptr != nullptr);
             assert(sizeInBytes == count*sizeof(T));
-            CUDA_CHECK(Memcpy((void *)t, d_ptr, count*sizeof(T), cudaMemcpyDeviceToHost));
+            CUDA_CHECK(cudaMemcpy((void *)t, d_ptr, count*sizeof(T), cudaMemcpyDeviceToHost));
         }
     };
 
