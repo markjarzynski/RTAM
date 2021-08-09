@@ -7,6 +7,8 @@ add_executable(test
     CUDABuffer.h
     Renderer.h
     Renderer.cpp
+    World.h
+    World.cpp
     main.cpp
 )
 

@@ -5,8 +5,10 @@ endif (POLICY CMP0048)
 project(RTAM VERSION 1.0)
 
 cmake_minimum_required(VERSION 3.2)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (NOT WIN32)
-set (CMAKE_CXX_FLAGS "--std=c++11")
+set (CMAKE_CXX_FLAGS "--std=c++17")
 set (CUDA_PROPAGATE_HOST_FLAGS ON)
 endif()
 

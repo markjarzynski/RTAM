@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "World.h"
 
 #include "sutil/vec_math.h"
 
@@ -6,11 +7,17 @@
 #include "3rdParty/stb_image_write.h"
 
 #include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace rtam {
 
     extern "C" int main(int ac, char **av) {
         try {
+            std::cout << fs::current_path() << std::endl;
+
+            World world = World("../../data/tetra.ray");
             Renderer renderer;
 
             int2 fbSize = make_int2(1024,1024);

@@ -194,20 +194,42 @@ namespace rtam {
         sbt.missRecordStrideInBytes = sizeof(MissRecord);
         sbt.missRecordCount = (int)missRecords.size();
 
-
-    }
-
-    void Renderer::resize(const int2 &newSize) {
-        // do something
-    }
-
-    void Renderer::downloadPixels(uint32_t pixels[]) {
-        // do something
+        int numObjects = 1;
+        std::vector<HitgroupRecord> hitgroupRecords;
+        for (int i = 0; i < numObjects; i++) {
+            int objectType = 0;
+            HitgroupRecord hitgroup_record;
+            OPTIX_CHECK(optixSbtRecordPackHeader(hitgroupProgramGroups[objectType], &hitgroup_record));
+            hitgroup_record.objectID = i;
+            hitgroupRecords.push_back(hitgroup_record);
+        }
+        hitgroupRecordsBuffer.alloc_and_upload(hitgroupRecords);
+        sbt.hitgroupRecordBase = hitgroupRecordsBuffer.d_pointer();
+        sbt.hitgroupRecordStrideInBytes = sizeof(HitgroupRecord);
+        sbt.hitgroupRecordCount = (int)hitgroupRecords.size();
     }
 
     void Renderer::render() {
-        // do something
+        if (launchParams.fbSize.x == 0) return;
+
+        launchParamsBuffer.upload(&launchParams,1);
+        launchParams.frameID++;
+
+        OPTIX_CHECK(optixLaunch(pipeline, stream, launchParamsBuffer.d_pointer(), launchParamsBuffer.sizeInBytes, &sbt, launchParams.fbSize.x, launchParams.fbSize.y, 1));
+        CUDA_SYNC_CHECK();
     }
 
+    void Renderer::resize(const int2 &newSize) {
+        if (newSize.x == 0 | newSize.y == 0) return;
+
+        colorBuffer.resize(newSize.x*newSize.y*sizeof(uint32_t));
+
+        launchParams.fbSize = newSize;
+        launchParams.colorBuffer = (uint32_t*)colorBuffer.d_ptr;
+    }
+
+    void Renderer::downloadPixels(uint32_t pixels[]) {
+        colorBuffer.download(pixels, launchParams.fbSize.x * launchParams.fbSize.y);
+    }
 
 }
