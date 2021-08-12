@@ -21,7 +21,7 @@ namespace rtam {
             Renderer renderer;
 
             int2 fbSize = make_int2(1024,1024);
-            renderer.resize(fbSize);
+
             renderer.render();
 
             std::vector<uint32_t> pixels (fbSize.x * fbSize.y);
