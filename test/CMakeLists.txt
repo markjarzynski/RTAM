@@ -14,6 +14,7 @@ add_executable(test
 
 target_link_libraries(test
     glad
+    sutil_7_sdk
     ${optix_LIBRARY}
     ${CUDA_LIBRARIES}
     ${CUDA_CUDA_LIBRARY}

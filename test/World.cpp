@@ -9,12 +9,8 @@ namespace rtam {
     // read a rayshade (.ray) file
     void World::read_rayshade (std::string filename) {
 
-        PRINT(filename);
-
         std::ifstream stream (filename, std::ifstream::in);
         std::string key;
-
-        std::cout << stream.is_open() << std::endl;
 
         while (stream >> key) {
 
@@ -28,7 +24,7 @@ namespace rtam {
                 float x, y, z;
                 stream >> x >> y >> z;
                 eyep = make_float3(x,y,z);
-                camera.setEye(eyep);
+                camera.setEye( {x, y, z} );
             } else if (key == "lookp") {
                 float x, y, z;
                 stream >> x >> y >> z;
@@ -43,19 +39,17 @@ namespace rtam {
                 float hfov, vfov;
                 stream >> hfov >> vfov;
                 fov = make_float2(hfov, vfov);
-                camera.setFovY(vfov);
-                camera.setAspectRatio(hfov/vfov);
+                camera.setFovY(hfov);
             } else if (key == "screen") {
-                float w, h;
+                int w, h;
                 stream >> w >> h;
                 screen = make_int2(w, h);
+                camera.setAspectRatio((float)w / (float)h);
             }
 
         }
 
         stream.close();
-
-        std::cout << filename << std::endl;
-
     }
+
 };

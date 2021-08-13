@@ -38,6 +38,10 @@
 #include <sutil/Scene.h>
 #include <sutil/sutil.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #define TINYGLTF_IMPLEMENTATION
 //#define STB_IMAGE_IMPLEMENTATION        // Implementation in sutil.cpp
 //#define STB_IMAGE_WRITE_IMPLEMENTATION  //

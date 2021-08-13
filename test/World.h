@@ -2,8 +2,8 @@
 
 #include "CUDABuffer.h"
 
-#include "sutil/vec_math.h"
-#include "sutil/Camera.h"
+#include <sutil/vec_math.h>
+#include <sutil/Camera.h>
 
 #include <string>
 #include <fstream>
@@ -27,6 +27,6 @@ namespace rtam {
 
     private:
         void read_rayshade(std::string filename);
-
+        void World::configureCamera(sutil::Camera& cam, const uint32_t width, const uint32_t height);
     };
 }

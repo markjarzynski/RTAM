@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (NOT WIN32)
@@ -54,7 +54,9 @@ set(SAMPLES_SUPPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../SDK/support")
 # NVRTC include paths relative to the sample path
 set(SAMPLES_RELATIVE_INCLUDE_DIRS "\\
   \"cuda\", \\
-  \"sutil\", ")
+  \"sutil\", \\
+  \"lib/DemandLoading/include\", \\
+  \".\", ")
 
 # NVRTC absolute include paths to the headers used to build the samples
 set(SAMPLES_ABSOLUTE_INCLUDE_DIRS "\\
