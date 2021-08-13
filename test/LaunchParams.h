@@ -1,15 +1,24 @@
 #pragma once
 
-#include "sutil/vec_math.h"
+#include <sutil/vec_math.h>
+#include <sutil/Camera.h>
 
 #include <cstdint>
 
 namespace rtam {
 
+    using namespace sutil;
+
     struct LaunchParams {
-        int frameID { 0 };
-        uint32_t *colorBuffer;
-        int2 fbSize;
+        struct {
+            int32_t ID { 0 };
+            uint32_t *colorBuffer;
+            int2 size;
+        } frame;
+
+        Camera camera;
+
+        OptixTraversableHandle traversable;
     };
 
 }

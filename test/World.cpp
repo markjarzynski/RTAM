@@ -1,5 +1,7 @@
 #include "World.h"
 
+#include <filesystem>
+
 namespace rtam {
 
     World::World (std::string filename) {
@@ -8,6 +10,8 @@ namespace rtam {
 
     // read a rayshade (.ray) file
     void World::read_rayshade (std::string filename) {
+
+        std::cout << "Reading file: " << std::filesystem::absolute(filename) << std::endl;
 
         std::ifstream stream (filename, std::ifstream::in);
         std::string key;

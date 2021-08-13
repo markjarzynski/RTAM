@@ -18,7 +18,7 @@ namespace rtam {
 
         const uint32_t rgba = 0xff0000ff;
 
-        const uint32_t fbIndex = ix + iy * optixLaunchParams.fbSize.x;
-        optixLaunchParams.colorBuffer[fbIndex] = rgba;
+        const uint32_t index = ix + iy * optixLaunchParams.frame.size.x;
+        optixLaunchParams.frame.colorBuffer[index] = rgba;
     }
 }

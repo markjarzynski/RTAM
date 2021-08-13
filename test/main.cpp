@@ -17,7 +17,13 @@ namespace rtam {
         try {
             std::cout << fs::current_path() << std::endl;
 
-            World world = World("../../data/tetra.ray");
+            World world = World(
+                #ifdef _WIN32 
+                "../" + 
+                #endif 
+                "../data/tetra.ray"
+            );
+
             Renderer renderer;
 
             int2 fbSize = make_int2(1024,1024);

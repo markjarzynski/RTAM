@@ -210,12 +210,12 @@ namespace rtam {
     }
 
     void Renderer::render() {
-        if (launchParams.fbSize.x == 0) return;
+        if (launchParams.frame.size.x == 0) return;
 
         launchParamsBuffer.upload(&launchParams,1);
-        launchParams.frameID++;
+        launchParams.frame.ID++;
 
-        OPTIX_CHECK(optixLaunch(pipeline, stream, launchParamsBuffer.d_pointer(), launchParamsBuffer.sizeInBytes, &sbt, launchParams.fbSize.x, launchParams.fbSize.y, 1));
+        OPTIX_CHECK(optixLaunch(pipeline, stream, launchParamsBuffer.d_pointer(), launchParamsBuffer.sizeInBytes, &sbt, launchParams.frame.size.x, launchParams.frame.size.y, 1));
         CUDA_SYNC_CHECK();
     }
 
@@ -224,12 +224,12 @@ namespace rtam {
 
         colorBuffer.resize(newSize.x*newSize.y*sizeof(uint32_t));
 
-        launchParams.fbSize = newSize;
-        launchParams.colorBuffer = (uint32_t*)colorBuffer.d_ptr;
+        launchParams.frame.size = newSize;
+        launchParams.frame.colorBuffer = (uint32_t*)colorBuffer.d_ptr;
     }
 
     void Renderer::downloadPixels(uint32_t pixels[]) {
-        colorBuffer.download(pixels, launchParams.fbSize.x * launchParams.fbSize.y);
+        colorBuffer.download(pixels, launchParams.frame.size.x * launchParams.frame.size.y);
     }
 
 }

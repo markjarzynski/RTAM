@@ -27,6 +27,5 @@ namespace rtam {
 
     private:
         void read_rayshade(std::string filename);
-        void configureCamera(sutil::Camera& cam, const uint32_t width, const uint32_t height);
     };
 }
