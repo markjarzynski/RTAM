@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
+project(RTAM VERSION 1.0)
+
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (NOT WIN32)
@@ -26,7 +30,6 @@ if( POLICY CMP0077 )
   cmake_policy(SET CMP0077 NEW)
 endif()
 
-project(RTAM VERSION 1.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 include(CMake/configure_build_type.cmake)
@@ -82,10 +85,10 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}
 set(SAMPLES_CUDA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cuda)
 
 mark_as_advanced(CUDA_SDK_ROOT_DIR)
+mark_as_advanced(OPTIX_INCLUDE)
+mark_as_advanced(OPTIX_LIBRARY)
 
 include_directories(common)
-
-set(optix_LIBRARY "")
 
 add_subdirectory(test)
 

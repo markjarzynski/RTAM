@@ -1,8 +1,8 @@
-include_directories(${OptiX_INCLUDE})
+include_directories(${OPTIX_INCLUDE})
 
 cuda_compile_and_embed(embedded_ptx_code devicePrograms.cu)
 
-add_executable(test
+cuda_add_executable(execute_test
     ${embedded_ptx_code}
     CUDABuffer.h
     Renderer.h
@@ -12,10 +12,10 @@ add_executable(test
     main.cpp
 )
 
-target_link_libraries(test
+target_link_libraries(execute_test
     glad
     sutil_7_sdk
-    ${optix_LIBRARY}
+    ${OPTIX_LIBRARY}
     ${CUDA_LIBRARIES}
     ${CUDA_CUDA_LIBRARY}
 )
