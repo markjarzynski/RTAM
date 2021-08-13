@@ -19,9 +19,10 @@ namespace rtam {
 
             World world = World(
                 #ifdef _WIN32 
-                "../" + 
-                #endif 
+                "../../data/tetra.ray"
+                #else
                 "../data/tetra.ray"
+                #endif
             );
 
             Renderer renderer;
