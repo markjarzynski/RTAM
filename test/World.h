@@ -3,6 +3,7 @@
 #include "CUDABuffer.h"
 
 #include "sutil/vec_math.h"
+#include "sutil/Camera.h"
 
 #include <string>
 #include <fstream>
@@ -16,8 +17,10 @@ namespace rtam {
         float3 eyep;
         float3 lookp;
         float3 up;
-        int2 fov;
+        float2 fov;
         int2 screen;
+
+        sutil::Camera camera;
 
     public:
         World (std::string filename);
