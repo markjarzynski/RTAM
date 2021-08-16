@@ -20,7 +20,7 @@ namespace rtam {
         float2 fov;
         int2 screen;
 
-        sutil::Camera camera;
+        //sutil::Camera camera;
 
     public:
         World (std::string filename);

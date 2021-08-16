@@ -27,15 +27,15 @@ namespace rtam {
 
             Renderer renderer;
 
-            int2 fbSize = make_int2(1024,1024);
-
+            int2 fsize = make_int2(1024,1024);
+            renderer.resize(fsize);
             renderer.render();
 
-            std::vector<uint32_t> pixels (fbSize.x * fbSize.y);
+            std::vector<uint32_t> pixels (fsize.x * fsize.y);
             renderer.downloadPixels(pixels.data());
 
             const std::string filename = "test.png";
-            stbi_write_png(filename.c_str(), fbSize.x, fbSize.y, 4, pixels.data(), fbSize.x * sizeof(uint32_t));
+            stbi_write_png(filename.c_str(), fsize.x, fsize.y, 4, pixels.data(), fsize.x * sizeof(uint32_t));
 
             std::cout << "Image rendered to " << filename << std::endl;
         } catch (std::runtime_error& e) {

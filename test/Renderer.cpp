@@ -23,13 +23,29 @@ namespace rtam {
 
     Renderer::Renderer() {
         initOptix();
+
+        std::cout << "Creating OptiX context." << std::endl;
         createContext();
+
+        std::cout << "Creating module." << std::endl;
         createModule();
+
+        std::cout << "Creating Raygen programs." << std::endl;
         createRaygenPrograms();
+
+        std::cout << "Creating Miss programs." << std::endl;
         createMissPrograms();
+
+        std::cout << "Creating Hitgroup programs." << std::endl;
         createHitgroupPrograms();
+
+        std::cout << "Creating Pipeline." << std::endl;
         createPipline();
+
+        std::cout << "Building SBT." << std::endl;
         buildSBT();
+
+        std::cout << "Allocating LaunchParamsBuffer." << std::endl;
         launchParamsBuffer.alloc(sizeof(launchParams));
     }
 
@@ -210,6 +226,8 @@ namespace rtam {
     }
 
     void Renderer::render() {
+        std::cout << launchParams.frame.size.x << " " << launchParams.frame.size.y << std::endl;
+
         if (launchParams.frame.size.x == 0) return;
 
         launchParamsBuffer.upload(&launchParams,1);

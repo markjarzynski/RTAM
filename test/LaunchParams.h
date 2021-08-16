@@ -7,8 +7,6 @@
 
 namespace rtam {
 
-    using namespace sutil;
-
     struct LaunchParams {
         struct {
             int32_t ID { 0 };
@@ -16,7 +14,7 @@ namespace rtam {
             int2 size;
         } frame;
 
-        Camera camera;
+        //Camera camera;
 
         OptixTraversableHandle traversable;
     };

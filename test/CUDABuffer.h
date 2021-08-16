@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sutil/Exception.h"
+#include <sutil/Exception.h>
 
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -25,8 +25,10 @@ namespace rtam {
         }
 
         void resize(size_t size) {
-            if (d_ptr)
+            if (d_ptr) {
                 free();
+            }
+
             alloc(size);
         }
 
