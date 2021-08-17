@@ -10,8 +10,6 @@ set (CMAKE_CXX_FLAGS "--std=c++17")
 set (CUDA_PROPAGATE_HOST_FLAGS ON)
 endif()
 
-cmake_policy(VERSION 2.6)
-
 if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)

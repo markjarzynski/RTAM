@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sutil/vec_math.h>
-#include <sutil/Camera.h>
 
 #include <cstdint>
 
@@ -14,7 +13,12 @@ namespace rtam {
             int2 size;
         } frame;
 
-        //Camera camera;
+        struct {
+            float3 eye;
+            float3 U;
+            float3 V;
+            float3 W;
+        } camera;
 
         OptixTraversableHandle traversable;
     };

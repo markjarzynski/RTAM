@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sutil/Camera.h>
+
 #include "CUDABuffer.h"
 #include "LaunchParams.h"
 
@@ -15,6 +17,8 @@ namespace rtam {
         void resize(const int2 &newSize);
 
         void downloadPixels(uint32_t pixels[]);
+
+        void setCamera(sutil::Camera &camera);
 
     protected:
         void initOptix();
@@ -52,6 +56,8 @@ namespace rtam {
         CUDABuffer launchParamsBuffer;
 
         CUDABuffer colorBuffer;
+
+        sutil::Camera lastCamera;
     };
 
 }
