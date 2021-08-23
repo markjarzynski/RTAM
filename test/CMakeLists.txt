@@ -6,6 +6,7 @@ cuda_add_executable(execute_test
     ${embedded_ptx_code}
     CUDABuffer.h
     LaunchParams.h
+    Camera.h
     Renderer.h
     Renderer.cpp
     World.h

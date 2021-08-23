@@ -237,12 +237,14 @@ namespace rtam {
         CUDA_SYNC_CHECK();
     }
 
+    /*
     void Renderer::setCamera(sutil::Camera &camera) {
         lastCamera = camera;
         camera.setAspectRatio(static_cast<float>(launchParams.frame.size.x) / static_cast<float>(launchParams.frame.size.y));
         launchParams.camera.eye = camera.eye();
         camera.UVWFrame(launchParams.camera.U, launchParams.camera.V, launchParams.camera.W);
     }
+    */
 
     void Renderer::resize(const int2 &newSize) {
         if (newSize.x == 0 | newSize.y == 0) return;
@@ -252,7 +254,7 @@ namespace rtam {
         launchParams.frame.size = newSize;
         launchParams.frame.colorBuffer = (uint32_t*)colorBuffer.d_ptr;
 
-        setCamera(lastCamera);
+        //setCamera(lastCamera);
     }
 
     void Renderer::downloadPixels(uint32_t pixels[]) {

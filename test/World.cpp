@@ -5,6 +5,7 @@
 namespace rtam {
 
     World::World (std::string filename) {
+        //camera = Camera();
         read_rayshade(filename);
     }
 
@@ -27,33 +28,39 @@ namespace rtam {
             } else if (key == "eyep") {
                 float x, y, z;
                 stream >> x >> y >> z;
-                eyep = make_float3(x,y,z);
-                camera.setEye( {x, y, z} );
+                camera.eyep = make_float3(x,y,z);
             } else if (key == "lookp") {
                 float x, y, z;
                 stream >> x >> y >> z;
-                lookp = make_float3(x,y,z);
-                camera.setLookat(lookp);
+                camera.lookp = make_float3(x,y,z);
             } else if (key == "up") {
                 float x, y, z;
                 stream >> x >> y >> z;
-                up = make_float3(x,y,z);
-                camera.setUp(up);
+                camera.up = make_float3(x,y,z);
             } else if (key == "fov") {
                 float hfov, vfov;
                 stream >> hfov >> vfov;
-                fov = make_float2(hfov, vfov);
-                camera.setFovY(hfov);
+                camera.fov = make_float2(hfov, vfov);
             } else if (key == "screen") {
                 int w, h;
                 stream >> w >> h;
                 screen = make_int2(w, h);
-                camera.setAspectRatio( static_cast<float>( w ) / static_cast<float>( h ) );
+                //camera.setAspectRatio( static_cast<float>( w ) / static_cast<float>( h ) );
             }
 
         }
 
         stream.close();
+
+
+        // Print out what we read in for sanity checks.
+        std::cout << "background " << background.x << " " << background.y << " " << background.z << std::endl;
+        std::cout << "eyep " << camera.eyep.x << " " << camera.eyep.y << " " << camera.eyep.z << std::endl;
+        std::cout << "lookp " << camera.lookp.x << " " << camera.lookp.y << " " << camera.lookp.z << std::endl;
+        std::cout << "up " << camera.up.x << " " << camera.up.y << " " << camera.up.z << std::endl;
+        std::cout << "fov " << camera.fov.x << " " << camera.fov.y << std::endl;
+        std::cout << "screen " << screen.x << " " << screen.y << std::endl;
+
     }
 
 };
