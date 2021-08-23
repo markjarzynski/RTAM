@@ -46,12 +46,30 @@ namespace rtam {
                 stream >> w >> h;
                 screen = make_int2(w, h);
                 //camera.setAspectRatio( static_cast<float>( w ) / static_cast<float>( h ) );
+            } else if (key == "polygon") {
+                // our current test file tetra.ray is made up of polygons with only 3 verticies, so using triangles right now
+
+                std::string mat;
+                float x, y, z;
+                float3 a, b, c;
+                Triangle tri;
+
+                stream >> mat;
+                stream >> x >> y >> z;
+                a = make_float3(x, y, z);
+                stream >> x >> y >> z;
+                b = make_float3(x, y, z);
+                stream >> x >> y >> z;
+                c = make_float3(x, y, z);
+
+                tri = Triangle(a,b,c);
+
+                triangles.push_back(tri);
             }
 
         }
 
         stream.close();
-
 
         // Print out what we read in for sanity checks.
         std::cout << "background " << background.x << " " << background.y << " " << background.z << std::endl;
@@ -60,6 +78,12 @@ namespace rtam {
         std::cout << "up " << camera.up.x << " " << camera.up.y << " " << camera.up.z << std::endl;
         std::cout << "fov " << camera.fov.x << " " << camera.fov.y << std::endl;
         std::cout << "screen " << screen.x << " " << screen.y << std::endl;
+
+        for (auto tri : triangles) {
+            std::cout << "polygon " << tri.a.x << " " << tri.a.y << " " << tri.a.z
+                             << " " << tri.b.x << " " << tri.b.y << " " << tri.b.z
+                             << " " << tri.c.x << " " << tri.c.y << " " << tri.c.z << std::endl;
+        }
 
     }
 

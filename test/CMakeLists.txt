@@ -7,6 +7,7 @@ cuda_add_executable(execute_test
     CUDABuffer.h
     LaunchParams.h
     Camera.h
+    Triangle.h
     Renderer.h
     Renderer.cpp
     World.h
