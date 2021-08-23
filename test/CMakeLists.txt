@@ -5,6 +5,7 @@ cuda_compile_and_embed(embedded_ptx_code devicePrograms.cu)
 cuda_add_executable(execute_test
     ${embedded_ptx_code}
     CUDABuffer.h
+    LaunchParams.h
     Renderer.h
     Renderer.cpp
     World.h
