@@ -21,7 +21,7 @@ namespace rtam {
         int objectID;
     };
 
-    Renderer::Renderer() {
+    Renderer::Renderer(const World *world) : world(world) {
         initOptix();
 
         std::cout << "Creating OptiX context." << std::endl;
@@ -38,6 +38,8 @@ namespace rtam {
 
         std::cout << "Creating Hitgroup programs." << std::endl;
         createHitgroupPrograms();
+
+        launchParams.traversable = buildAccel();
 
         std::cout << "Creating Pipeline." << std::endl;
         createPipline();
@@ -225,6 +227,24 @@ namespace rtam {
         sbt.hitgroupRecordCount = (int)hitgroupRecords.size();
     }
 
+    OptixTraversableHandle Renderer::buildAccel() {
+        vertexBuffer.resize(world->triangles.size());
+        indexBuffer.resize(world->triangles.size());
+
+        OptixTraversableHandle asHandle { 0 };
+
+        std::vector<OptixBuildInput> triangleInput(world->triangles.size());
+        std::vector<CUdeviceptr> d_vertices(world->triangles.size());
+        std::vector<CUdeviceptr> d_indices(world->triangles.size());
+        std::vector<uint32_t> triangleInputFlags(world->triangles.size());
+
+        for (int i = 0; i < world->triangles.size(); i++) {
+            // TODO: finish buildAccel();
+        }
+
+        return asHandle;
+    }
+
     void Renderer::render() {
         std::cout << launchParams.frame.size.x << " " << launchParams.frame.size.y << std::endl;
 
@@ -237,14 +257,12 @@ namespace rtam {
         CUDA_SYNC_CHECK();
     }
 
-    /*
-    void Renderer::setCamera(sutil::Camera &camera) {
+    void Renderer::setCamera(Camera &camera) {
         lastCamera = camera;
         camera.setAspectRatio(static_cast<float>(launchParams.frame.size.x) / static_cast<float>(launchParams.frame.size.y));
-        launchParams.camera.eye = camera.eye();
+        launchParams.camera.eye = camera.eyep;
         camera.UVWFrame(launchParams.camera.U, launchParams.camera.V, launchParams.camera.W);
     }
-    */
 
     void Renderer::resize(const int2 &newSize) {
         if (newSize.x == 0 | newSize.y == 0) return;
@@ -254,7 +272,7 @@ namespace rtam {
         launchParams.frame.size = newSize;
         launchParams.frame.colorBuffer = (uint32_t*)colorBuffer.d_ptr;
 
-        //setCamera(lastCamera);
+        setCamera(lastCamera);
     }
 
     void Renderer::downloadPixels(uint32_t pixels[]) {

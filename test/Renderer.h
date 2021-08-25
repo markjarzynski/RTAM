@@ -2,12 +2,14 @@
 
 #include "CUDABuffer.h"
 #include "LaunchParams.h"
+#include "Camera.h"
+#include "World.h"
 
 namespace rtam {
 
     class Renderer {
     public:
-        Renderer();
+        Renderer(const World *world);
 
     public:
         void render();
@@ -16,7 +18,7 @@ namespace rtam {
 
         void downloadPixels(uint32_t pixels[]);
 
-        //void setCamera(sutil::Camera &camera);
+        void setCamera(Camera &camera);
 
     protected:
         void initOptix();
@@ -27,6 +29,7 @@ namespace rtam {
         void createHitgroupPrograms();
         void createPipline();
         void buildSBT();
+        OptixTraversableHandle buildAccel();
 
     protected:
         CUcontext cudaContext;
@@ -55,7 +58,13 @@ namespace rtam {
 
         CUDABuffer colorBuffer;
 
-        //sutil::Camera lastCamera;
+        Camera lastCamera;
+
+        const World *world;
+
+        std::vector<CUDABuffer> vertexBuffer;
+        std::vector<CUDABuffer> indexBuffer;
+        CUDABuffer asBuffer;
     };
 
 }

@@ -18,16 +18,16 @@ namespace rtam {
             std::cout << fs::current_path() << std::endl;
 
             World world = World(
-                #ifdef _WIN32 
+                #ifdef _WIN32
                 "../../data/tetra.ray"
                 #else
                 "../data/tetra.ray"
                 #endif
             );
 
-            Renderer renderer;
+            Renderer renderer = Renderer(&world);
 
-            int2 fsize = make_int2(1024,1024);
+            int2 fsize = world.screen;
             renderer.resize(fsize);
             renderer.render();
 

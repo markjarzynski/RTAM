@@ -13,6 +13,7 @@ namespace rtam {
         float3 lookp;
         float3 up;
         float2 fov;
+        float aspect_ratio;
 
     public:
         Camera() {
@@ -27,6 +28,23 @@ namespace rtam {
         }
 
         Camera(float3 eyep, float3 lookp, float3 up, float2 fov) : eyep(eyep), lookp(lookp), up(up), fov(fov) {}
+
+    public:
+        void setAspectRatio(float ratio) {
+            aspect_ratio = ratio;
+        }
+
+        void UVWFrame(float3& U, float3& V, float3& W) const
+        {
+            W = lookp - eyep;
+            U = normalize(cross(W, up));
+            V = normalize(cross(U, W));
+
+            float len = length(W) * tanf(0.5f * fov.y * M_PIf / 180.0f);
+            V *= len;
+            U *= len * aspect_ratio;
+        }
+
     };
 
     /*
