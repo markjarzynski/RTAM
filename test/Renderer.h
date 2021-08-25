@@ -63,6 +63,7 @@ namespace rtam {
         const World *world;
 
         std::vector<CUDABuffer> vertexBuffer;
+        std::vector<CUDABuffer> normalBuffer;
         std::vector<CUDABuffer> indexBuffer;
         CUDABuffer asBuffer;
     };

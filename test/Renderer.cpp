@@ -16,9 +16,9 @@ namespace rtam {
         void *data;
     };
 
-    struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) HitgroupRecord {
-        __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
-        int objectID;
+    struct __align__( OPTIX_SBT_RECORD_ALIGNMENT ) HitgroupRecord {
+        __align__( OPTIX_SBT_RECORD_ALIGNMENT ) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
+        TriangleMeshSBTData data;
     };
 
     Renderer::Renderer(const World *world) : world(world) {
@@ -212,13 +212,16 @@ namespace rtam {
         sbt.missRecordStrideInBytes = sizeof(MissRecord);
         sbt.missRecordCount = (int)missRecords.size();
 
-        int numObjects = 1;
         std::vector<HitgroupRecord> hitgroupRecords;
-        for (int i = 0; i < numObjects; i++) {
-            int objectType = 0;
+        for (int i = 0; i < world->triangles.size(); i++) {
+            Triangle t = world->triangles[i];
             HitgroupRecord hitgroup_record;
-            OPTIX_CHECK(optixSbtRecordPackHeader(hitgroupProgramGroups[objectType], &hitgroup_record));
-            hitgroup_record.objectID = i;
+
+            OPTIX_CHECK(optixSbtRecordPackHeader(hitgroupProgramGroups[0], &hitgroup_record));
+            hitgroup_record.data.color = t.diffuse;
+            hitgroup_record.data.vertex = (float3*)vertexBuffer[i].d_pointer();
+            hitgroup_record.data.normal = (float3*)normalBuffer[i].d_pointer();
+            hitgroup_record.data.index = (float3*)indexBuffer[i].d_pointer();
             hitgroupRecords.push_back(hitgroup_record);
         }
         hitgroupRecordsBuffer.alloc_and_upload(hitgroupRecords);
@@ -229,6 +232,7 @@ namespace rtam {
 
     OptixTraversableHandle Renderer::buildAccel() {
         vertexBuffer.resize(world->triangles.size());
+        normalBuffer.resize(world->triangles.size());
         indexBuffer.resize(world->triangles.size());
 
         OptixTraversableHandle asHandle { 0 };
@@ -239,8 +243,70 @@ namespace rtam {
         std::vector<uint32_t> triangleInputFlags(world->triangles.size());
 
         for (int i = 0; i < world->triangles.size(); i++) {
-            // TODO: finish buildAccel();
+            Triangle t = world->triangles[i];
+            vertexBuffer[i].alloc_and_upload(t.v);
+            normalBuffer[i].alloc_and_upload(t.n);
+            indexBuffer[i].alloc_and_upload(t.i);
+
+            triangleInput[i] = {};
+            triangleInput[i].type = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
+
+            d_vertices[i] = vertexBuffer[i].d_pointer();
+            d_indices[i] = indexBuffer[i].d_pointer();
+
+            triangleInput[i].triangleArray.vertexFormat = OPTIX_VERTEX_FORMAT_FLOAT3;
+            triangleInput[i].triangleArray.vertexStrideInBytes = sizeof(float3);
+            triangleInput[i].triangleArray.numVertices = t.v.size();
+            triangleInput[i].triangleArray.vertexBuffers = &d_vertices[i];
+
+            triangleInput[i].triangleArray.indexFormat = OPTIX_INDICES_FORMAT_UNSIGNED_INT3;
+            triangleInput[i].triangleArray.indexStrideInBytes = sizeof(int3);
+            triangleInput[i].triangleArray.numIndexTriplets = t.i.size();
+            triangleInput[i].triangleArray.indexBuffer = d_indices[i];
+
+            triangleInputFlags[i] = 0;
+
+            triangleInput[i].triangleArray.flags = &triangleInputFlags[i];
+            triangleInput[i].triangleArray.numSbtRecords = 1;
+            triangleInput[i].triangleArray.sbtIndexOffsetBuffer = 0;
+            triangleInput[i].triangleArray.sbtIndexOffsetSizeInBytes = 0;
+            triangleInput[i].triangleArray.sbtIndexOffsetStrideInBytes = 0;
         }
+
+        OptixAccelBuildOptions accelOptions = {};
+        accelOptions.buildFlags = OPTIX_BUILD_FLAG_NONE | OPTIX_BUILD_FLAG_ALLOW_COMPACTION;
+        accelOptions.motionOptions.numKeys = 1;
+        accelOptions.operation = OPTIX_BUILD_OPERATION_BUILD;
+
+        OptixAccelBufferSizes blasBufferSizes;
+        OPTIX_CHECK(optixAccelComputeMemoryUsage(optixContext, &accelOptions, triangleInput.data(), world->triangles.size(), &blasBufferSizes));
+
+        CUDABuffer compactedSizeBuffer;
+        compactedSizeBuffer.alloc(sizeof(uint64_t));
+
+        OptixAccelEmitDesc emitDesc;
+        emitDesc.type = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE;
+        emitDesc.result = compactedSizeBuffer.d_pointer();
+
+        CUDABuffer tempBuffer;
+        tempBuffer.alloc(blasBufferSizes.tempSizeInBytes);
+
+        CUDABuffer outputBuffer;
+        outputBuffer.alloc(blasBufferSizes.outputSizeInBytes);
+
+        OPTIX_CHECK(optixAccelBuild(optixContext, 0, &accelOptions, triangleInput.data(), world->triangles.size(), tempBuffer.d_pointer(), tempBuffer.sizeInBytes, outputBuffer.d_pointer(), outputBuffer.sizeInBytes, &asHandle, &emitDesc, 1));
+        CUDA_SYNC_CHECK();
+
+        uint64_t compactedSize;
+        compactedSizeBuffer.download(&compactedSize,1);
+
+        asBuffer.alloc(compactedSize);
+        OPTIX_CHECK(optixAccelCompact(optixContext, 0, asHandle, asBuffer.d_pointer(), asBuffer.sizeInBytes, &asHandle));
+        CUDA_SYNC_CHECK();
+
+        outputBuffer.free();
+        tempBuffer.free();
+        compactedSizeBuffer.free();
 
         return asHandle;
     }

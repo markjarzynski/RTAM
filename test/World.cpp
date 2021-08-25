@@ -17,6 +17,8 @@ namespace rtam {
         std::ifstream stream (filename, std::ifstream::in);
         std::string key;
 
+        float3 diffuse = make_float3(1,1,1);
+
         while (stream >> key) {
 
             if (key == "outfile") {
@@ -62,9 +64,13 @@ namespace rtam {
                 stream >> x >> y >> z;
                 c = make_float3(x, y, z);
 
-                tri = Triangle(a,b,c);
+                tri = Triangle(a,b,c,diffuse);
 
                 triangles.push_back(tri);
+            } else if (key == "diffuse") {
+                float x, y, z;
+                stream >> x >> y >> z;
+                diffuse = make_float3(x,y,z);
             }
 
         }
@@ -79,11 +85,21 @@ namespace rtam {
         std::cout << "fov " << camera.fov.x << " " << camera.fov.y << std::endl;
         std::cout << "screen " << screen.x << " " << screen.y << std::endl;
 
+        std::cout << "diffuse " << diffuse.x << " " << diffuse.y << " " << diffuse.z << std::endl;
+
+        /*
         for (auto tri : triangles) {
             std::cout << "polygon " << tri.v[0].x << " " << tri.v[0].y << " " << tri.v[0].z
                              << " " << tri.v[1].x << " " << tri.v[1].y << " " << tri.v[1].z
                              << " " << tri.v[2].x << " " << tri.v[2].y << " " << tri.v[2].z << std::endl;
         }
+        */
+
+        std::cout << "faces: " << triangles.size() << std::endl;
+        std::cout << "vertices: " << triangles.size() * 3 << std::endl;
+        std::cout << "edges: " << triangles.size() * 3 << std::endl;
+
+
 
     }
 

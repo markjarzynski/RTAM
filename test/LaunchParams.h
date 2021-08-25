@@ -6,6 +6,13 @@
 
 namespace rtam {
 
+    struct TriangleMeshSBTData {
+        float3 color;
+        float3 *vertex;
+        float3 *index;
+        float3 *normal;
+    };
+
     struct LaunchParams {
         struct {
             int32_t ID { 0 };
