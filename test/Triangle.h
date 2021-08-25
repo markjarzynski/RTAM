@@ -2,27 +2,35 @@
 
 #include <sutil/vec_math.h>
 
+#include <vector>
+
 namespace rtam {
 
     class Triangle {
     public:
-        float3 a, b, c;
-        float3 n0, n1, n2;
+        std::vector<float3> v;
+        std::vector<float3> n;
 
     public:
         Triangle() {
-            a = make_float3(1,0,0);
-            b = make_float3(0,1,0);
-            c = make_float3(0,0,1);
-        }
-
-        Triangle(float3 a, float3 b, float3 c) : a(a), b(b), c(c) {
+            v.push_back(make_float3(1,0,0)); v.push_back(make_float3(0,1,0)); v.push_back(make_float3(0,0,1));
             setNormal();
         }
 
-    public:
+        Triangle(float3 v0, float3 v1, float3 v2) {
+            v.push_back(v0); v.push_back(v1); v.push_back(v2);
+            setNormal();
+        }
+
+        Triangle(float3 v0, float3 v1, float3 v2, float3 n0, float3 n1, float3 n2) {
+            v.push_back(v0); v.push_back(v1); v.push_back(v2);
+            n.push_back(n0); n.push_back(n1); n.push_back(n2);
+        }
+
+    private:
         void setNormal() {
-            n0 = n1 = n2 = normalize(cross(b - a, c - b));
+            float3 normal = normalize(cross(v[1] - v[0], v[2] - v[1]));
+            n.push_back(normal); n.push_back(normal); n.push_back(normal);
         }
 
     };

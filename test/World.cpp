@@ -80,9 +80,9 @@ namespace rtam {
         std::cout << "screen " << screen.x << " " << screen.y << std::endl;
 
         for (auto tri : triangles) {
-            std::cout << "polygon " << tri.a.x << " " << tri.a.y << " " << tri.a.z
-                             << " " << tri.b.x << " " << tri.b.y << " " << tri.b.z
-                             << " " << tri.c.x << " " << tri.c.y << " " << tri.c.z << std::endl;
+            std::cout << "polygon " << tri.v[0].x << " " << tri.v[0].y << " " << tri.v[0].z
+                             << " " << tri.v[1].x << " " << tri.v[1].y << " " << tri.v[1].z
+                             << " " << tri.v[2].x << " " << tri.v[2].y << " " << tri.v[2].z << std::endl;
         }
 
     }
