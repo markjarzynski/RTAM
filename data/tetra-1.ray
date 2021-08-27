@@ -1,0 +1,19 @@
+background 0.078 0.361 0.753
+eyep 1.02285 -3.17715 -2.17451
+lookp -0.004103 -0.004103 0.216539
+up -0.816497 -0.816497 0.816497
+fov 45 45
+screen 512 512
+sample 1 nojitter
+light 1 point 2 -18 -5
+surface txt001
+    ambient 0 0 0
+    diffuse 1 0.2 0.2
+polygon txt001
+-1 -1 1 -1 1 -1 1 -1 -1
+polygon txt001
+1 1 1 1 -1 -1 -1 1 -1
+polygon txt001
+1 -1 -1 1 1 1 -1 -1 1
+polygon txt001
+-1 1 -1 -1 -1 1 1 1 1 

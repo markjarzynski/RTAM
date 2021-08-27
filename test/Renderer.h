@@ -18,7 +18,9 @@ namespace rtam {
 
         void downloadPixels(uint32_t pixels[]);
 
-        void setCamera(Camera &camera);
+        void setCamera(Camera camera);
+
+        void setBackground(float3 background);
 
     protected:
         void initOptix();

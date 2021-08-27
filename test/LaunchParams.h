@@ -9,8 +9,8 @@ namespace rtam {
     struct TriangleMeshSBTData {
         float3 color;
         float3 *vertex;
-        float3 *index;
         float3 *normal;
+        int3 *index;
     };
 
     struct LaunchParams {
@@ -26,6 +26,8 @@ namespace rtam {
             float3 V;
             float3 W;
         } camera;
+
+        float3 background;
 
         OptixTraversableHandle traversable;
     };

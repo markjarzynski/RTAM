@@ -36,6 +36,7 @@ namespace rtam {
 
         void UVWFrame(float3& U, float3& V, float3& W) const
         {
+            /*
             W = lookp - eyep;
             U = normalize(cross(W, up));
             V = normalize(cross(U, W));
@@ -43,6 +44,11 @@ namespace rtam {
             float len = length(W) * tanf(0.5f * fov.y * M_PIf / 180.0f);
             V *= len;
             U *= len * aspect_ratio;
+            */
+
+            W = normalize(lookp - eyep);
+            U = normalize(cross(W, up));
+            V = normalize(cross(W, U));
         }
 
     };

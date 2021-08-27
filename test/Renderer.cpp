@@ -21,7 +21,11 @@ namespace rtam {
         TriangleMeshSBTData data;
     };
 
-    Renderer::Renderer(const World *world) : world(world) {
+    Renderer::Renderer(const World *w) : world(w) {
+
+        setCamera(world->camera);
+        setBackground(world->background);
+
         initOptix();
 
         std::cout << "Creating OptiX context." << std::endl;
@@ -221,7 +225,7 @@ namespace rtam {
             hitgroup_record.data.color = t.diffuse;
             hitgroup_record.data.vertex = (float3*)vertexBuffer[i].d_pointer();
             hitgroup_record.data.normal = (float3*)normalBuffer[i].d_pointer();
-            hitgroup_record.data.index = (float3*)indexBuffer[i].d_pointer();
+            hitgroup_record.data.index = (int3*)indexBuffer[i].d_pointer();
             hitgroupRecords.push_back(hitgroup_record);
         }
         hitgroupRecordsBuffer.alloc_and_upload(hitgroupRecords);
@@ -314,6 +318,11 @@ namespace rtam {
     void Renderer::render() {
         std::cout << launchParams.frame.size.x << " " << launchParams.frame.size.y << std::endl;
 
+        std::cout << launchParams.camera.eye.x << " " << launchParams.camera.eye.y << " " << launchParams.camera.eye.z << std::endl;
+        std::cout << launchParams.camera.U.x << " " << launchParams.camera.U.y << " " << launchParams.camera.U.z << std::endl;
+        std::cout << launchParams.camera.V.x << " " << launchParams.camera.V.y << " " << launchParams.camera.V.z << std::endl;
+        std::cout << launchParams.camera.W.x << " " << launchParams.camera.W.y << " " << launchParams.camera.W.z << std::endl;
+
         if (launchParams.frame.size.x == 0) return;
 
         launchParamsBuffer.upload(&launchParams,1);
@@ -323,11 +332,15 @@ namespace rtam {
         CUDA_SYNC_CHECK();
     }
 
-    void Renderer::setCamera(Camera &camera) {
+    void Renderer::setCamera(Camera camera) {
         lastCamera = camera;
         camera.setAspectRatio(static_cast<float>(launchParams.frame.size.x) / static_cast<float>(launchParams.frame.size.y));
         launchParams.camera.eye = camera.eyep;
         camera.UVWFrame(launchParams.camera.U, launchParams.camera.V, launchParams.camera.W);
+    }
+
+    void Renderer::setBackground(float3 background) {
+        launchParams.background = background;
     }
 
     void Renderer::resize(const int2 &newSize) {
