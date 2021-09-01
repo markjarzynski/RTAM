@@ -8,13 +8,19 @@
 
 #include <iostream>
 #include <filesystem>
+#include <chrono>
 
 namespace fs = std::filesystem;
 
 namespace rtam {
 
     extern "C" int main(int ac, char **av) {
+
+        // Get the start time in milliseconds so we can figure out how long it took this program to execute
+        auto start_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
         try {
+
             std::cout << fs::current_path() << std::endl;
 
             World world = World(
@@ -42,6 +48,14 @@ namespace rtam {
             std::cout << "FATAL ERROR: " << e.what() << std::endl;
             exit(1);
         }
+
+        // Get the end time and convert to "seconds.milliseconds"
+        auto end_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        auto milliseconds = end_time - start_time;
+        auto seconds = milliseconds / 1000;
+        milliseconds %= 1000;
+        // print out seconds.milliseconds seconds
+        std::cout << seconds << "." << milliseconds << " seconds" << std::endl;
 
         return 0;
     }
