@@ -339,7 +339,7 @@ namespace rtam {
 
         if (launchParams.frame.size.x == 0) return;
 
-        auto previous = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        auto previous = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         auto current = previous;
 
         std::cout << "Rendering... ";
@@ -350,8 +350,7 @@ namespace rtam {
         OPTIX_CHECK(optixLaunch(pipeline, stream, launchParamsBuffer.d_pointer(), launchParamsBuffer.sizeInBytes, &sbt, launchParams.frame.size.x, launchParams.frame.size.y, 1));
         CUDA_SYNC_CHECK();
 
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
+        PRINT_MS(previous, current);
     }
 
     void Renderer::setCamera(Camera camera) {
