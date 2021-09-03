@@ -11,7 +11,7 @@
 #include <assert.h>
 
 #ifndef PRINT
-# define PRINT(var) std::cout << #var << "=" << var << std::endl;
+#define PRINT(var) std::cout << #var << "=" << var << std::endl;
 #endif
 
 namespace rtam {

@@ -4,6 +4,11 @@
 
 #include <chrono>
 
+#define PRINT_MS(PREVIOUS, CURRENT) \
+    CURRENT = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); \
+    std::cout << (CURRENT - PREVIOUS) / 1000 << "." << (CURRENT - PREVIOUS) % 1000 << "ms" << std::endl; \
+    previous = current;
+
 namespace rtam {
 
     extern "C" char embedded_ptx_code[];
@@ -25,7 +30,7 @@ namespace rtam {
 
     Renderer::Renderer(const World *w) : world(w) {
 
-        auto previous = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        auto previous = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         auto current = previous;
 
         setCamera(world->camera);
@@ -35,66 +40,39 @@ namespace rtam {
 
         std::cout << "Creating OptiX context... ";
         createContext();
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
 
         std::cout << "Creating module... ";
         createModule();
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
 
         std::cout << "Creating Raygen programs... ";
         createRaygenPrograms();
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
 
         std::cout << "Creating Miss programs... ";
         createMissPrograms();
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
 
         std::cout << "Creating Hitgroup programs... ";
         createHitgroupPrograms();
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
 
         std::cout << "Building Accel... ";
         launchParams.traversable = buildAccel();
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
 
         std::cout << "Creating Pipeline... ";
         createPipline();
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
 
         std::cout << "Building SBT... ";
         buildSBT();
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
 
         std::cout << "Allocating LaunchParamsBuffer... ";
         launchParamsBuffer.alloc(sizeof(launchParams));
-
-        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::cout << current - previous << "ms" << std::endl;
-        previous = current;
+        PRINT_MS(previous,current);
     }
 
     void Renderer::initOptix() {

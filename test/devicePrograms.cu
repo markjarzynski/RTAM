@@ -45,18 +45,27 @@ namespace rtam {
 
         const float3 v = (sbtData.vertex[index.x] + sbtData.vertex[index.y] + sbtData.vertex[index.z]) / 3.0f;
 
+        /*
         float3 &prd = *(float3*)getPRD<float3>();
         prd = (0.2f + 0.8f * fabsf(dot(rayd,normal))) * sbtData.color;
-        //uint3 vi = make_uint3(v.x,v.y,v.z);
-        //prd = (0.2f + 0.8f * fabsf(dot(rayd,normal))) * make_float3(pcg3d(vi)) / 0xffffffffu;
+        */
+
+        float4 &prd = *(float4*)getPRD<float4>();
+        prd = make_float4((0.2f + 0.8f * fabsf(dot(rayd,normal))) * sbtData.color, 1.0f);
     }
 
     extern "C" __global__ void __anyhit__radiance() { }
 
     extern "C" __global__ void __miss__radiance() {
+        /*
         float3 &prd = *(float3*)getPRD<float3>();
         prd = make_float3(0.f,0.f,0.f);
         prd = optixLaunchParams.background;
+        */
+
+        float4 &prd = *(float4*)getPRD<float4>();
+        prd = make_float4(0.f,0.f,0.f,0.f);
+        prd = make_float4(optixLaunchParams.background, 0.f);
     }
 
     extern "C" __global__ void __raygen__renderFrame() {
@@ -65,7 +74,8 @@ namespace rtam {
 
         const auto &camera = optixLaunchParams.camera;
 
-        float3 pixelColorPRD = make_float3(0.f,0.f,0.f);
+        //float3 pixelColorPRD = make_float3(0.f,0.f,0.f);
+        float4 pixelColorPRD = make_float4(0.f,0.f,0.f,1.f);
 
         uint32_t u0, u1;
         packPointer( &pixelColorPRD, u0, u1 );
@@ -80,8 +90,10 @@ namespace rtam {
         const int r = int(255.99f*pixelColorPRD.x);
         const int g = int(255.99f*pixelColorPRD.y);
         const int b = int(255.99f*pixelColorPRD.z);
+        const int a = int(255.99f*pixelColorPRD.w);
 
-        const uint32_t rgba = 0xff000000 | r | (g<<8u) | (b<<16u);
+        //const uint32_t rgba = 0xff000000 | r | (g<<8u) | (b<<16u);
+        const uint32_t rgba = r | (g<<8u) | (b<<16u) | (a<<24u);
 
         const uint32_t fbIndex = ix+iy*optixLaunchParams.frame.size.x;
         optixLaunchParams.frame.colorBuffer[fbIndex] = rgba;

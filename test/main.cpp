@@ -54,6 +54,7 @@ namespace rtam {
         auto milliseconds = end_time - start_time;
         auto seconds = milliseconds / 1000;
         milliseconds %= 1000;
+
         // print out seconds.milliseconds seconds
         std::cout << "Total time: " << seconds << "." << milliseconds << " seconds" << std::endl;
 
