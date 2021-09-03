@@ -2,6 +2,8 @@
 
 #include <optix_function_table_definition.h>
 
+#include <chrono>
+
 namespace rtam {
 
     extern "C" char embedded_ptx_code[];
@@ -23,40 +25,80 @@ namespace rtam {
 
     Renderer::Renderer(const World *w) : world(w) {
 
+        auto previous = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        auto current = previous;
+
         setCamera(world->camera);
         setBackground(world->background);
 
         initOptix();
 
-        std::cout << "Creating OptiX context." << std::endl;
+        std::cout << "Creating OptiX context... ";
         createContext();
 
-        std::cout << "Creating module." << std::endl;
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
+
+        std::cout << "Creating module... ";
         createModule();
 
-        std::cout << "Creating Raygen programs." << std::endl;
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
+
+        std::cout << "Creating Raygen programs... ";
         createRaygenPrograms();
 
-        std::cout << "Creating Miss programs." << std::endl;
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
+
+        std::cout << "Creating Miss programs... ";
         createMissPrograms();
 
-        std::cout << "Creating Hitgroup programs." << std::endl;
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
+
+        std::cout << "Creating Hitgroup programs... ";
         createHitgroupPrograms();
 
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
+
+        std::cout << "Building Accel... ";
         launchParams.traversable = buildAccel();
 
-        std::cout << "Creating Pipeline." << std::endl;
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
+
+        std::cout << "Creating Pipeline... ";
         createPipline();
 
-        std::cout << "Building SBT." << std::endl;
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
+
+        std::cout << "Building SBT... ";
         buildSBT();
 
-        std::cout << "Allocating LaunchParamsBuffer." << std::endl;
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
+
+        std::cout << "Allocating LaunchParamsBuffer... ";
         launchParamsBuffer.alloc(sizeof(launchParams));
+
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
+        previous = current;
     }
 
     void Renderer::initOptix() {
-        std::cout << "Initializing Optix." << std::endl;
+        std::cout << "Initializing Optix..." << std::endl;
 
         cudaFree(0);
         int numDevices;
@@ -316,20 +358,22 @@ namespace rtam {
     }
 
     void Renderer::render() {
-        std::cout << launchParams.frame.size.x << " " << launchParams.frame.size.y << std::endl;
-
-        std::cout << launchParams.camera.eye.x << " " << launchParams.camera.eye.y << " " << launchParams.camera.eye.z << std::endl;
-        std::cout << launchParams.camera.U.x << " " << launchParams.camera.U.y << " " << launchParams.camera.U.z << std::endl;
-        std::cout << launchParams.camera.V.x << " " << launchParams.camera.V.y << " " << launchParams.camera.V.z << std::endl;
-        std::cout << launchParams.camera.W.x << " " << launchParams.camera.W.y << " " << launchParams.camera.W.z << std::endl;
 
         if (launchParams.frame.size.x == 0) return;
+
+        auto previous = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        auto current = previous;
+
+        std::cout << "Rendering... ";
 
         launchParamsBuffer.upload(&launchParams,1);
         launchParams.frame.ID++;
 
         OPTIX_CHECK(optixLaunch(pipeline, stream, launchParamsBuffer.d_pointer(), launchParamsBuffer.sizeInBytes, &sbt, launchParams.frame.size.x, launchParams.frame.size.y, 1));
         CUDA_SYNC_CHECK();
+
+        current = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << current - previous << "ms" << std::endl;
     }
 
     void Renderer::setCamera(Camera camera) {

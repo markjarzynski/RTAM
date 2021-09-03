@@ -25,9 +25,9 @@ namespace rtam {
 
             World world = World(
                 #ifdef _WIN32
-                "../../data/tetra.ray"
+                "../../data/tetra-9.ray"
                 #else
-                "../data/tetra.ray"
+                "../data/tetra-9.ray"
                 #endif
             );
 
@@ -55,7 +55,7 @@ namespace rtam {
         auto seconds = milliseconds / 1000;
         milliseconds %= 1000;
         // print out seconds.milliseconds seconds
-        std::cout << seconds << "." << milliseconds << " seconds" << std::endl;
+        std::cout << "Total time: " << seconds << "." << milliseconds << " seconds" << std::endl;
 
         return 0;
     }
