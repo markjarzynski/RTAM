@@ -29,17 +29,20 @@ namespace rtam {
     };
 
     Renderer::Renderer(const World *w) : world(w) {
+        
+         setCamera(world->camera);
+        setBackground(world->background);
+
 
         auto previous = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         auto current = previous;
 
-        setCamera(world->camera);
-        setBackground(world->background);
-
         initOptix();
+        std::cout << "Initializing Optix...";
+        PRINT_MS(previous,current);
 
-        std::cout << "Creating OptiX context... ";
         createContext();
+        std::cout << "Creating OptiX context... ";
         PRINT_MS(previous,current);
 
         std::cout << "Creating module... ";
@@ -76,7 +79,6 @@ namespace rtam {
     }
 
     void Renderer::initOptix() {
-        std::cout << "Initializing Optix..." << std::endl;
 
         cudaFree(0);
         int numDevices;
@@ -137,7 +139,7 @@ namespace rtam {
         char log[2048];
         size_t sizeof_log = sizeof(log);
         OPTIX_CHECK(optixModuleCreateFromPTX(optixContext, &moduleCompileOptions, &pipelineCompileOptions, ptxCode.c_str(), ptxCode.size(), log, &sizeof_log, &module));
-        if (sizeof_log > 1) PRINT(log);
+        //if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::createRaygenPrograms() {
@@ -152,7 +154,7 @@ namespace rtam {
         char log[2048];
         size_t sizeof_log = sizeof(log);
         OPTIX_CHECK(optixProgramGroupCreate(optixContext, &pgDesc, 1, &pgOptions, log, &sizeof_log, &raygenProgramGroups[0]));
-        if (sizeof_log > 1) PRINT(log);
+        //if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::createMissPrograms() {
@@ -167,7 +169,7 @@ namespace rtam {
         char log[2048];
         size_t sizeof_log = sizeof(log);
         OPTIX_CHECK(optixProgramGroupCreate(optixContext, &pgDesc, 1, &pgOptions, log, &sizeof_log, &missProgramGroups[0]));
-        if (sizeof_log > 1) PRINT(log);
+        //if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::createHitgroupPrograms() {
@@ -184,7 +186,7 @@ namespace rtam {
         char log[2048];
         size_t sizeof_log = sizeof(log);
         OPTIX_CHECK(optixProgramGroupCreate(optixContext, &pgDesc, 1, &pgOptions, log, &sizeof_log, &hitgroupProgramGroups[0]));
-        if (sizeof_log > 1) PRINT(log);
+        //if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::createPipline() {
@@ -206,10 +208,10 @@ namespace rtam {
         char log[2048];
         size_t sizeof_log = sizeof(log);
         OPTIX_CHECK(optixPipelineCreate(optixContext, &pipelineCompileOptions, &pipelineLinkOptions, programGroups.data(), (int)programGroups.size(), log, &sizeof_log, &pipeline));
-        if (sizeof_log > 1) PRINT(log);
+        //if (sizeof_log > 1) PRINT(log);
 
         OPTIX_CHECK(optixPipelineSetStackSize(pipeline, 2048, 2048, 2048, 1));
-        if (sizeof_log > 1) PRINT(log);
+        //if (sizeof_log > 1) PRINT(log);
     }
 
     void Renderer::buildSBT() {
