@@ -1,5 +1,8 @@
 #pragma once
 
+#define FLOATX 128
+// 152 seems to be the max on my 1080
+
 #include <sutil/vec_math.h>
 
 #include <cstdint>
@@ -31,5 +34,7 @@ namespace rtam {
 
         OptixTraversableHandle traversable;
     };
+
+    typedef float floatx[FLOATX];
 
 }

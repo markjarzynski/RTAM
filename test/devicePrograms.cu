@@ -39,7 +39,6 @@ namespace rtam {
         const int i = optixGetPrimitiveIndex();
         const int3 index = sbtData.index[i];
 
-        //const int i = optixGetPrimitiveIndex();
         const float3 rayd = optixGetWorldRayDirection();
         const float3 normal = sbtData.normal[index.x];
 
@@ -50,8 +49,20 @@ namespace rtam {
         prd = (0.2f + 0.8f * fabsf(dot(rayd,normal))) * sbtData.color;
         */
 
+        /*
         float4 &prd = *(float4*)getPRD<float4>();
         prd = make_float4((0.2f + 0.8f * fabsf(dot(rayd,normal))) * sbtData.color, 1.0f);
+        */
+
+        const float4 c = make_float4((0.2f + 0.8f * fabsf(dot(rayd,normal))) * sbtData.color, 1.0f);
+
+        floatx &prd = *(floatx*)getPRD<floatx>();
+        for (int i = 0; i < FLOATX; i+=4) {
+            prd[i] = c.x;
+            prd[i+1] = c.y;
+            prd[i+2] = c.z;
+            prd[i+3] = c.w;
+        }
     }
 
     extern "C" __global__ void __anyhit__radiance() { }
@@ -63,9 +74,21 @@ namespace rtam {
         prd = optixLaunchParams.background;
         */
 
+        /*
         float4 &prd = *(float4*)getPRD<float4>();
         prd = make_float4(0.f,0.f,0.f,0.f);
         prd = make_float4(optixLaunchParams.background, 0.f);
+        */
+
+        const float4 c = make_float4(optixLaunchParams.background, 0.f);
+
+        floatx &prd = *(floatx*)getPRD<floatx>();
+        for (int i = 0; i < FLOATX; i+=4) {
+            prd[i] = c.x;
+            prd[i+1] = c.y;
+            prd[i+2] = c.z;
+            prd[i+3] = c.w;
+        }
     }
 
     extern "C" __global__ void __raygen__renderFrame() {
@@ -75,7 +98,8 @@ namespace rtam {
         const auto &camera = optixLaunchParams.camera;
 
         //float3 pixelColorPRD = make_float3(0.f,0.f,0.f);
-        float4 pixelColorPRD = make_float4(0.f,0.f,0.f,1.f);
+        //float4 pixelColorPRD = make_float4(0.f,0.f,0.f,1.f);
+        floatx pixelColorPRD;
 
         uint32_t u0, u1;
         packPointer( &pixelColorPRD, u0, u1 );
@@ -87,10 +111,24 @@ namespace rtam {
 
         optixTrace(optixLaunchParams.traversable, rayo, rayd, 0.f, 1e20f, 0.0f, OptixVisibilityMask( 255 ), OPTIX_RAY_FLAG_DISABLE_ANYHIT, SURFACE_RAY_TYPE, RAY_TYPE_COUNT, SURFACE_RAY_TYPE, u0, u1);
 
+        /*
         const int r = int(255.99f*pixelColorPRD.x);
         const int g = int(255.99f*pixelColorPRD.y);
         const int b = int(255.99f*pixelColorPRD.z);
         const int a = int(255.99f*pixelColorPRD.w);
+        */
+
+        float c[4] = {0.f, 0.f, 0.f, 0.f};
+
+        for (int i = 0; i < FLOATX; i++) {
+            c[i%4] += pixelColorPRD[i] / (FLOATX / 4.f);
+        }
+
+        const int r = int(255.99f*c[0]);
+        const int g = int(255.99f*c[1]);
+        const int b = int(255.99f*c[2]);
+        const int a = int(255.99f*c[3]);
+
 
         //const uint32_t rgba = 0xff000000 | r | (g<<8u) | (b<<16u);
         const uint32_t rgba = r | (g<<8u) | (b<<16u) | (a<<24u);
