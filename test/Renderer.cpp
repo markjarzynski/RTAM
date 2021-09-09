@@ -210,7 +210,7 @@ namespace rtam {
         OPTIX_CHECK(optixPipelineCreate(optixContext, &pipelineCompileOptions, &pipelineLinkOptions, programGroups.data(), (int)programGroups.size(), log, &sizeof_log, &pipeline));
         //if (sizeof_log > 1) PRINT(log);
 
-        OPTIX_CHECK(optixPipelineSetStackSize(pipeline, 2048, 2048, 2048, 1));
+        OPTIX_CHECK(optixPipelineSetStackSize(pipeline, 4096, 4096, 4096, 1));
         //if (sizeof_log > 1) PRINT(log);
     }
 

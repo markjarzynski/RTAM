@@ -1,8 +1,6 @@
 #pragma once
 
-#define FLOATX 1024
-// 152 seems to be the max on my 1080
-// 1024 works on the 3090, but 2048 doesn't
+#define FLOATX 2048
 
 #include <sutil/vec_math.h>
 
