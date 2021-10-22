@@ -1,6 +1,6 @@
 #pragma once
 
-#define FLOATX 2048
+#define FLOATX 4
 
 #include <sutil/vec_math.h>
 
@@ -19,6 +19,7 @@ namespace rtam {
         struct {
             int32_t ID { 0 };
             uint32_t *colorBuffer;
+            uint32_t* ray_count;
             int2 size;
         } frame;
 

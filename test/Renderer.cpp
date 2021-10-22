@@ -346,6 +346,10 @@ namespace rtam {
 
         std::cout << "Rendering... ";
 
+        uint32_t ray_count = 0;
+
+        launchParams.frame.ray_count = &ray_count;
+
         launchParamsBuffer.upload(&launchParams,1);
         launchParams.frame.ID++;
 
@@ -353,6 +357,8 @@ namespace rtam {
         CUDA_SYNC_CHECK();
 
         PRINT_MS(previous, current);
+
+        std::cout << "Num Rays: " << launchParams.frame.size.x * launchParams.frame.size.y << std::endl;
     }
 
     void Renderer::setCamera(Camera camera) {

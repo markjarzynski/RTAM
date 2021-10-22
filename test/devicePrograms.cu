@@ -109,6 +109,9 @@ namespace rtam {
         const float3 rayd = normalize(camera.U * (screen.x - 0.5f) + camera.V * (screen.y - 0.5f) + camera.W);
         const float3 rayo = camera.eye;
 
+        //atomicAdd(optixLaunchParams.frame.ray_count, 1);
+        //optixLaunchParams.frame.ray_count++;
+
         optixTrace(optixLaunchParams.traversable, rayo, rayd, 0.f, 1e20f, 0.0f, OptixVisibilityMask( 255 ), OPTIX_RAY_FLAG_DISABLE_ANYHIT, SURFACE_RAY_TYPE, RAY_TYPE_COUNT, SURFACE_RAY_TYPE, u0, u1);
 
         /*
@@ -135,5 +138,6 @@ namespace rtam {
 
         const uint32_t fbIndex = ix+iy*optixLaunchParams.frame.size.x;
         optixLaunchParams.frame.colorBuffer[fbIndex] = rgba;
+        
     }
 }
