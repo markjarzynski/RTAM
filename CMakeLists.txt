@@ -89,6 +89,7 @@ mark_as_advanced(OPTIX_LIBRARY)
 include_directories(common)
 
 add_subdirectory(test)
+add_subdirectory(tomo)
 
 # Nvidia's stuil library
 add_subdirectory(sutil)
