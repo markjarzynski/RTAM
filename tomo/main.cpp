@@ -40,7 +40,7 @@ namespace rtam {
             std::vector<uint32_t> pixels (fsize.x * fsize.y);
             renderer.downloadPixels(pixels.data());
 
-            const std::string filename = "test.png";
+            const std::string filename = "tomo.png";
             stbi_write_png(filename.c_str(), fsize.x, fsize.y, 4, pixels.data(), fsize.x * sizeof(uint32_t));
 
             std::cout << "Image rendered to " << filename << std::endl;

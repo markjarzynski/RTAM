@@ -33,6 +33,13 @@ namespace rtam {
       return reinterpret_cast<T*>( unpackPointer( u0, u1 ) );
     }
 
+    static __forceinline__ __device__ void trace(OptixTraversableHandle handle, float3 rayo, float3 rayd, float tmin, float tmax, float4* prd)
+    {
+      uint32_t u0, u1;
+      packPointer( prd, u0, u1 );
+      optixTrace(handle, rayo, rayd, tmin, tmax, 0.0f, OptixVisibilityMask( 255 ), OPTIX_RAY_FLAG_DISABLE_ANYHIT, SURFACE_RAY_TYPE, RAY_TYPE_COUNT, SURFACE_RAY_TYPE, u0, u1);
+    }
+
     extern "C" __global__ void __closesthit__radiance() {
         const TriangleMeshSBTData &sbtData = *(const TriangleMeshSBTData*)optixGetSbtDataPointer();
 
@@ -47,6 +54,12 @@ namespace rtam {
         float4 &prd = *(float4*)getPRD<float4>();
         prd = make_float4((0.2f + 0.8f * fabsf(dot(rayd,normal))) * sbtData.color, 1.0f);
 
+        const float3 rayo = optixGetWorldRayOrigin() + optixGetRayTmax()*rayd;
+
+        float4 prd2 = make_float4(0.f,0.f,0.f,1.f);
+        trace(optixLaunchParams.traversable, rayo, rayd, 0.f, 1e20f, &prd2);
+
+        prd += prd2;
     }
 
     extern "C" __global__ void __anyhit__radiance() { }
@@ -63,10 +76,7 @@ namespace rtam {
 
         const auto &camera = optixLaunchParams.camera;
 
-        float4 pixelColorPRD = make_float4(0.f,0.f,0.f,1.f);
-
-        uint32_t u0, u1;
-        packPointer( &pixelColorPRD, u0, u1 );
+        float4 prd = make_float4(0.f,0.f,0.f,1.f);
 
         const float2 screen = make_float2(ix + 0.5f, iy + 0.5f) / make_float2(optixLaunchParams.frame.size);
 
@@ -76,12 +86,12 @@ namespace rtam {
         //atomicAdd(optixLaunchParams.frame.ray_count, 1);
         //optixLaunchParams.frame.ray_count++;
 
-        optixTrace(optixLaunchParams.traversable, rayo, rayd, 0.f, 1e20f, 0.0f, OptixVisibilityMask( 255 ), OPTIX_RAY_FLAG_DISABLE_ANYHIT, SURFACE_RAY_TYPE, RAY_TYPE_COUNT, SURFACE_RAY_TYPE, u0, u1);
+        trace(optixLaunchParams.traversable, rayo, rayd, 0.f, 1e20f, &prd);
 
-        const int r = int(255.99f*pixelColorPRD.x);
-        const int g = int(255.99f*pixelColorPRD.y);
-        const int b = int(255.99f*pixelColorPRD.z);
-        const int a = int(255.99f*pixelColorPRD.w);
+        const int r = int(255.99f*prd.x);
+        const int g = int(255.99f*prd.y);
+        const int b = int(255.99f*prd.z);
+        const int a = int(255.99f*prd.w);
         
         const uint32_t rgba = 0xff000000 | r | (g<<8u) | (b<<16u);
 
